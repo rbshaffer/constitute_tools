@@ -6,12 +6,12 @@
 
 import os
 import re
-import csv
-import codecs
+import file_utils
 import inspect
 import unicodedata
 from copy import deepcopy
 from itertools import chain
+
 
 class HierarchyTagger:
     def __init__(self, text_path, header_regex, tag_path=None, preamble_level=0, case_sensitive=False,
@@ -45,18 +45,11 @@ class HierarchyTagger:
         else:
             self.case_flags = re.I | re.M
 
-        with EncodingOpen(text_path) as f:
+        with file_utils.TextLoader(text_path) as f:
             self.text = f.read()
 
         # read reference data, if any
-        if tag_format == 'ccp':
-            if os.path.exists(tag_path):
-                with open(tag_path, 'rb') as f:
-                    self.tag_data = list(csv.DictReader(f))
-            else:
-                print('Tag path not found, so tagging will not be conducted.')
-        else:
-            print('Tagging not currently implemented for non-CCP tag formats, so tagging will not be conducted.')
+        self.tag_data = file_utils.TagLoader(tag_path, tag_format).data
 
         if self.tag_data:
             self.tag_report = []
@@ -212,13 +205,13 @@ class HierarchyTagger:
             return out
 
         if output_format == 'ccp':
-            out = format_ccp(self.parsed)
+            out_data = format_ccp(self.parsed)
 
             # rectangularize
-            max_cols = max(len(row) for row in out)
-            out = [row + ['']*(max_cols - len(row)) for row in out]
+            max_cols = max(len(row) for row in out_data)
+            out_data = [row + ['']*(max_cols - len(row)) for row in out_data]
 
-            return out
+            return out_data
 
         else:
             print('Only CCP output format currently implemented.')
@@ -232,7 +225,7 @@ class Segmenter:
         :param text: text to be segmented
         :param header_regex: list of header regex to be used for segmentation
         :param preamble_level: highest-level organizational tag following the document's preamble.
-        :param case_sensitive: indicator for whether the header regex matches should be case-sensitive.
+        :param case_flags: indicator for whether the header regex matches should be case-sensitive.
         """
 
         self.text = text
@@ -624,25 +617,3 @@ def clean_text(raw_text):
     cleaned = re.sub('\r +', '\r', cleaned)
 
     return cleaned
-
-
-class EncodingOpen:
-    def __init__(self, filename):
-        encodings = ['utf-8-sig', 'utf-8', 'iso-8859-15']
-        for encoding in encodings:
-            try:
-                self.file = codecs.open(filename, 'rb', encoding)
-
-                print('Assuming ' + encoding + ' encoding.')
-                break
-            except UnicodeDecodeError:
-                pass
-
-        if not self.file:
-            raise UnicodeDecodeError('Encoding not recognized! Re-save the cleaned text as utf-8 to continue.')
-
-    def __enter__(self):
-        return self.file
-
-    def __exit__(self, ctx_type, ctx_value, ctx_traceback):
-        self.file.close()
