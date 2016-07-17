@@ -38,8 +38,8 @@ class HierarchyTagger:
         self.text = None
         self.parsed = None
         self.skeleton = None
-        self.tag_data = None
-        self.tag_report = None
+        self.tag_data = []
+        self.tag_report = []
 
         if case_sensitive:
             self.case_flags = re.M
