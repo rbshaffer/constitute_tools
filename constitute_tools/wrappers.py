@@ -4,8 +4,9 @@ import os
 import re
 import csv
 import codecs
-import file_utils
-import segmenter
+import parser
+import _file_utils as utils
+
 
 
 class Tabulator:
@@ -26,13 +27,13 @@ class Tabulator:
         :param text_path: path to file to be cleaned.
         """
 
-        with file_utils.TextLoader(text_path) as f:
+        with utils.TextLoader(text_path) as f:
             raw_text = f.read()
 
         file_name = os.path.basename(text_path)
         out_path = '{1}{0}Constitute{0}Cleaned_Texts{0}{2}'.format(os.sep, self.pwd, file_name)
 
-        cleaned = segmenter.clean_text(raw_text)
+        cleaned = parser.clean_text(raw_text)
 
         with codecs.open(out_path, 'wb', 'utf-8') as f:
             f.write(cleaned)
@@ -61,33 +62,33 @@ class Tabulator:
         skeleton_path = '{1}{0}Constitute{0}Reports{0}{2}_skeleton.txt'.format(os.sep, self.pwd, file_name)
         tag_path = '{1}{0}Constitute{0}Article_Numbers{0}{2}.csv'.format(os.sep, self.pwd, file_name)
 
-        parser = segmenter.HierarchyTagger(text_path=text_path, header_regex=header_regex,
-                                           preamble_level=preamble_level, case_sensitive=case_sensitive,
-                                           tag_format=tag_format, tag_path=tag_path)
-        parser.parse()
-        parser.apply_tags()
-        out = parser.create_output(output_format=writer_format)
+        manager = parser.HierarchyManager(text_path=text_path, header_regex=header_regex,
+                                          preamble_level=preamble_level, case_sensitive=case_sensitive,
+                                          tag_format=tag_format, tag_path=tag_path)
+        manager.parse()
+        manager.apply_tags()
+        out = manager.create_output(output_format=writer_format)
 
         # write output and generate reports
         with open(out_path, 'wb') as f:
-            file_utils.UnicodeWriter(f).writerows(out)
+            utils.UnicodeWriter(f).writerows(out)
 
-        if parser.tag_data:
-            if parser.tag_report is not None:
-                print('{0} out of {1} tags not matched. See reports for details.'.format(len(parser.tag_report),
-                                                                                         len(parser.tag_data)))
+        if manager.tag_data:
+            if manager.tag_report is not None:
+                print('{0} out of {1} tags not matched. See reports for details.'.format(len(manager.tag_report),
+                                                                                         len(manager.tag_data)))
                 with open(tag_report_path, 'wb') as f:
-                    var_names = sorted(parser.tag_report[0].keys())
+                    var_names = sorted(manager.tag_report[0].keys())
 
                     writer = csv.DictWriter(f, var_names)
                     writer.writeheader()
-                    writer.writerows(parser.tag_report)
+                    writer.writerows(manager.tag_report)
             else:
                 print('All tags successfully matched.')
 
         with open(skeleton_path, 'wb') as f:
             f.write(repr(header_regex) + os.linesep)
-            f.writelines(parser.skeleton)
+            f.writelines(manager.skeleton)
 
     def set_structure(self):
         """

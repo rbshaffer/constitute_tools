@@ -6,14 +6,14 @@
 
 import os
 import re
-import file_utils
+import _file_utils as utils
 import inspect
 import unicodedata
 from copy import deepcopy
 from itertools import chain
 
 
-class HierarchyTagger:
+class HierarchyManager:
     def __init__(self, text_path, header_regex, tag_path=None, preamble_level=0, case_sensitive=False,
                  tag_format='ccp'):
         """
@@ -45,11 +45,11 @@ class HierarchyTagger:
         else:
             self.case_flags = re.I | re.M
 
-        with file_utils.TextLoader(text_path) as f:
+        with utils.TextLoader(text_path) as f:
             self.text = f.read()
 
         # read reference data, if any
-        self.tag_data = file_utils.TagLoader(tag_path, tag_format).data
+        self.tag_data = utils.TagLoader(tag_path, tag_format).data
 
         if self.tag_data:
             self.tag_report = []
@@ -57,7 +57,7 @@ class HierarchyTagger:
             self.tag_report = None
 
         # initialize Segmenter()
-        self.segmenter = Segmenter(self.text, self.header_regex, self.case_flags, preamble_level)
+        self.parser = _Parser(self.text, self.header_regex, self.case_flags, preamble_level)
 
     def parse(self):
         """
@@ -82,8 +82,8 @@ class HierarchyTagger:
                         out = create_skeleton(entry['children'], out, depth)
             return out
 
-        self.segmenter.segment()
-        self.parsed = self.segmenter.parsed
+        self.parser.segment()
+        self.parsed = self.parser.parsed
         self.skeleton = create_skeleton(self.parsed)
 
     def apply_tags(self):
@@ -217,7 +217,7 @@ class HierarchyTagger:
             print('Only CCP output format currently implemented.')
 
 
-class Segmenter:
+class _Parser:
     def __init__(self, text, header_regex, case_flags, preamble_level):
         """
         Segmenter class, which does actual document segmentation work. Intended to be called through HierarchyTagger.
