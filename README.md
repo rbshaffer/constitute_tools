@@ -1,4 +1,4 @@
-# Constitute_Tools
+# constitute_tools
 
 Auxilary toolset for [Constitute](https://www.constituteproject.org/) data backend. Package contains two primary tools:
 
