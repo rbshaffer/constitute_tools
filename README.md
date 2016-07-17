@@ -1,7 +1,9 @@
 # constitute_tools
 
-Auxilary toolset for [Constitute](https://www.constituteproject.org/) data backend. Package contains two primary tools:
+Auxilary toolset for [Constitute](https://www.constituteproject.org/) data backend. Package is intended to perform two basic functions:
 
-- Regular-expression-based parser, which subdivides hierarchical documents according to organizational headers while maintaining hierachical structure.
+1. Arbitrarily subdivide hierarchical documents according to organizational headers, while maintaining hierarchical structure.
 
-- Tag-matching tool, which applies content tags to appropriate sections of the document.
+2. Match content tags to appropriate positions in document hierarchy.
+
+Basic functionality is provided through the parser.HierachyManager class, which exposes a variety of analysis, error-checking, and output-generating methods. A wrapper for parser.HierarchyManager is provided in wrappers.Tabulator, which handles file path management and output creation for smaller-scale tagging applications.
