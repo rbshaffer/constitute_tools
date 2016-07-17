@@ -6,6 +6,7 @@ import csv
 import codecs
 import cStringIO
 import segmenter
+segmenter = reload(segmenter)
 
 class Tabulator:
     def __init__(self, working_directory):
@@ -70,8 +71,8 @@ class Tabulator:
         tag_path = '{1}{0}Constitute{0}Article_Numbers{0}{2}.csv'.format(os.sep, self.pwd, file_name)
 
         parser = segmenter.HierarchyTagger(text_path=text_path, header_regex=header_regex,
-                                              preamble_level=preamble_level, case_sensitive=case_sensitive,
-                                              tag_format=tag_format, tag_path=tag_path)
+                                           preamble_level=preamble_level, case_sensitive=case_sensitive,
+                                           tag_format=tag_format, tag_path=tag_path)
         parser.parse()
         parser.apply_tags()
         out = parser.create_output(output_format=writer_format)
@@ -83,17 +84,18 @@ class Tabulator:
         with open(out_path, 'wb') as f:
             UnicodeWriter(f).writerows(out)
 
-        if parser.tag_report:
-            print('{0} out of {1} tags not matched. See reports for details.'.format(len(parser.tag_report),
-                                                                                     len(parser.tag_data)))
-            with open(tag_report_path, 'wb') as f:
-                var_names = sorted(parser.tag_report[0].keys())
+        if parser.tag_data:
+            if parser.tag_report is not None:
+                print('{0} out of {1} tags not matched. See reports for details.'.format(len(parser.tag_report),
+                                                                                         len(parser.tag_data)))
+                with open(tag_report_path, 'wb') as f:
+                    var_names = sorted(parser.tag_report[0].keys())
 
-                writer = csv.DictWriter(f, var_names)
-                writer.writeheader()
-                writer.writerows(parser.tag_report)
-        else:
-            print('All tags successfully matched.')
+                    writer = csv.DictWriter(f, var_names)
+                    writer.writeheader()
+                    writer.writerows(parser.tag_report)
+            else:
+                print('All tags successfully matched.')
 
         with open(skeleton_path, 'wb') as f:
             f.write(repr(header_regex) + os.linesep)

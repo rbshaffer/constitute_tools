@@ -38,8 +38,7 @@ class HierarchyTagger:
         self.text = None
         self.parsed = None
         self.skeleton = None
-        self.tag_data = []
-        self.tag_report = []
+        self.tag_data = None
 
         if case_sensitive:
             self.case_flags = re.M
@@ -58,6 +57,11 @@ class HierarchyTagger:
                 print('Tag path not found, so tagging will not be conducted.')
         else:
             print('Tagging not currently implemented for non-CCP tag formats, so tagging will not be conducted.')
+
+        if self.tag_data:
+            self.tag_report = []
+        else:
+            self.tag_report = None
 
         # initialize Segmenter()
         self.segmenter = Segmenter(self.text, self.header_regex, self.case_flags, preamble_level)
@@ -154,23 +158,22 @@ class HierarchyTagger:
 
             return obj
 
-        self.tag_report = []
-
         stub_table = create_stub_table(self.parsed)
 
         # check for tag matches and apply tags to the parsed object
-        for tag_entry in self.tag_data:
-            tag_name = tag_entry['tag']
-            tag_reference = tag_entry['article']
+        if self.tag_data:
+            for tag_entry in self.tag_data:
+                tag_name = tag_entry['tag']
+                tag_reference = tag_entry['article']
 
-            matches = [s for s in stub_table if re.search('^' + tag_reference + '$|\.' + tag_reference + '$', s,
-                                                          self.case_flags)]
+                matches = [s for s in stub_table if re.search('^' + tag_reference + '$|\.' + tag_reference + '$', s,
+                                                              self.case_flags)]
 
-            if len(matches) == 1:
-                key_sequence = deepcopy(stub_table[matches[0]])
-                self.parsed = apply_tag(self.parsed, key_sequence, tag_name)
-            else:
-                self.tag_report.append(tag_entry)
+                if len(matches) == 1:
+                    key_sequence = deepcopy(stub_table[matches[0]])
+                    self.parsed = apply_tag(self.parsed, key_sequence, tag_name)
+                else:
+                    self.tag_report.append(tag_entry)
 
     def create_output(self, output_format='ccp'):
         """
@@ -246,7 +249,7 @@ class Segmenter:
         then reassembled into a single output.
         """
 
-        def segment(obj, header_tag, case_flags):
+        def shatter(obj, header_tag, case_flags):
                 """
                 Recursive function to segment a given object, using a given organizational tag. Segmented items are
                 placed under the "children" key of the object, and then recursively segmented if any additional headers
@@ -262,7 +265,6 @@ class Segmenter:
                 entry_counter = 0
                 while entry_counter < len(obj):
                     entry = obj[entry_counter]
-
                     header_matches = list(re.finditer(header_tag, entry['text'], flags=case_flags))
 
                     # if a header match is found, split the text into pre-match start_stub and post-match content
@@ -297,6 +299,7 @@ class Segmenter:
                                                         'text_type': 'body',
                                                         'tags': []
                                                         }
+
                             new_entries.append(new_entry)
 
                         # if there is a start_stub, then add new header matches as children of the current entry
@@ -306,6 +309,7 @@ class Segmenter:
                                                     'children': {i: new_entries[i] for i in range(len(new_entries))},
                                                     'text_type': 'body',
                                                     'tags': []}
+                            entry['text'] = ''
                         # otherwise, add the new entries to the current level (keeping preexisting content)
                         else:
                             updated_obj = {i: obj[i] for i in obj if i < entry_counter}
@@ -314,7 +318,7 @@ class Segmenter:
 
                             obj = updated_obj
 
-                    entry['children'] = segment(entry['children'], header_tag, case_flags)
+                    entry['children'] = shatter(entry['children'], header_tag, case_flags)
                     entry_counter += 1
 
                 return obj
@@ -380,9 +384,9 @@ class Segmenter:
 
         # shatter tabulated file and the list table
         for tag in self.header_regex:
-            self.parsed = segment(self.parsed, tag, self.case_flags)
+            self.parsed = shatter(self.parsed, tag, self.case_flags)
             for key in self.list_table:
-                self.list_table[key] = segment(self.list_table[key], tag, self.case_flags)
+                self.list_table[key] = shatter(self.list_table[key], tag, self.case_flags)
 
         # reassemble the tabulated file and the list table together
         self.parsed = assemble(self.parsed, self.list_table)
@@ -481,7 +485,7 @@ class Segmenter:
 
             return text, list_data
 
-        def segment_preamble(text, headers, pre_level):
+        def shatter_preamble(text, headers, pre_level):
             """
             Extract the preamble. Preambles are separated from the body of the text and placed into self.tabulated.
             """
@@ -519,14 +523,13 @@ class Segmenter:
                                'text_type': 'title',
                                'tags': []})
 
-            to_add.append({'header': None,
+            to_add.append({'header': '',
                            'text': body,
                            'children': {},
                            'text_type': 'body',
                            'tags': []})
 
             tabulated = {i: to_add[i] for i in range(len(to_add))}
-
             return tabulated
 
         to_process = self.text
@@ -545,7 +548,7 @@ class Segmenter:
 
         # get lists, split preamble from the rest of the text, and return containers ready for further segmentation
         to_process, lists = extract_lists(to_process)
-        segmented = segment_preamble(to_process, self.header_regex, self.preamble_level)
+        segmented = shatter_preamble(to_process, self.header_regex, self.preamble_level)
 
         return segmented, lists
 
@@ -556,7 +559,7 @@ class Segmenter:
         """
 
         def minimal_format(text_string):
-            text_string = re.sub('<.*?>|\{@[0-9]+\}', ' ', text_string)
+            text_string = re.sub('<.*?>', ' ', text_string)
             text_string = ''.join(e for e in text_string if unicodedata.category(e)[0] not in ['P', 'C'])
             text_string = text_string.lower()
             text_string = re.sub('\s+', ' ', text_string)
@@ -580,7 +583,7 @@ class Segmenter:
 
         original_text = self.text
         for tag in self.header_regex:
-            original_text = re.sub(tag, '', original_text, flags=self.case_flags)
+            original_text = re.sub(tag, ' ', original_text, flags=self.case_flags)
 
         original_text = minimal_format(original_text)
 
