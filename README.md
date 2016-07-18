@@ -59,8 +59,12 @@ header_regex = ['Header the First [0-9]+', 'Header the Second [a-z]', 'Header|Th
 manager = HierarchyManager(text_path = text_path, header_regex = header_regex, tag_path = tag_path)
 manager.parse()
 manager.apply_tags()
+```
 
-# view the first object in the parsed output
+After parsing and tag application, HierarchyManager then offers several output and error-checking options:
+
+```
+# view the first object in the parsed output (which can be written if appropriate)
 print(manager.parsed[0])
 
 # view the "skeleton" of header tags, to make sure that all relevant headers were captured
