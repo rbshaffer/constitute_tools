@@ -83,7 +83,7 @@ with open('/path/to/output.csv', 'wb') as f:
 For serial tagging taks, the wrappers.Tabulate class can streamline file management and function calls:
 
 ```
-from constitute_tools.wrapper import Tabulator
+from constitute_tools.wrappers import Tabulator
 
 working_dir = '/path/to/working_directory'
 raw_text_path = '/path/to/raw_text.txt'
