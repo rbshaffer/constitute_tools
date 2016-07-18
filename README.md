@@ -80,7 +80,7 @@ with open('/path/to/output.csv', 'wb') as f:
   csv.writer(f).writerows(ccp_out)
 ```
 
-For serial tagging taks, the wrappers.Tabulate wrapper can streamline file management and function calls:
+For serial tagging taks, the wrappers.Tabulate class can streamline file management and function calls:
 
 ```
 from constitute_tools.wrapper import Tabulate
