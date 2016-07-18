@@ -610,7 +610,7 @@ def clean_text(raw_text):
     """
 
     cleaned = re.sub('[\t ]+', ' ', raw_text)
-    cleaned = re.sub('\n(?=[a-z][^.:)])| +', ' ', cleaned)
+    cleaned = re.sub('\n(?=[a-z]+[^.:)])| +', ' ', cleaned)
     cleaned = re.sub('\n+', '\n', cleaned)
     cleaned = re.sub('(\n\r)+', '\n\r', cleaned)
     cleaned = re.sub('\n +', '\n', cleaned)

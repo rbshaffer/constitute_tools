@@ -8,7 +8,6 @@ import parser
 import _file_utils as utils
 
 
-
 class Tabulator:
     def __init__(self, working_directory):
         """
