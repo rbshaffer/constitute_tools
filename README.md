@@ -98,7 +98,7 @@ tabulator.clean_text(raw_text_path)
 cleaned_text = '/path/to/Constitute/Cleaned_Text/cleaned.txt'
 header_regex = ['Header the First [0-9]+', 'Header the Second [a-z]', 'Header|The|Third']
 
-# tabulate() will parse, apply tags, and write the output to the Tabulated_Texts folder, using the CCP output format
+# tabulate() will parse, apply tags, and write a CCP-style output to the Tabulated_Texts folder
 # reports will be written to the Reports folder
 tabulator.tabulate(cleaned_text, header_regex)
 ```
