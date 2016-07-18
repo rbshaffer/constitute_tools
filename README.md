@@ -12,7 +12,7 @@ Basic functionality is provided through ``parser.HierachyManager``, which expose
 **constitute_tools** assumes Python 2.7.x (Python 3 version coming soon). No dependencies beyond the base Python packages are required. 
 
 # Usage
-The workhorse class in **constitute_tools** is ``parser.HierarchyManager``. ``parser.HierachyManager`` has three main methods, which take a path to the text, header tags, and a path to the content tags (if any) as inputs. Additional arguments provide further customization; for details, see documentation.
+The workhorse class in **constitute_tools** is ``parser.HierarchyManager``. ``parser.HierachyManager`` has three main methods, which take (1) a path to the text, (2) a list of header tags, and (3) a path to the content tags (if any) as inputs. Additional arguments provide further customization; for details, see documentation.
 
 # Inputs
 ## Texts
