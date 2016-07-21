@@ -34,21 +34,16 @@ class TextLoader:
         encodings = ['utf-8-sig', 'utf-8', 'iso-8859-15']
         for encoding in encodings:
             try:
-                self.file = codecs.open(filename, 'rb', encoding)
+                with codecs.open(filename, 'rb', encoding) as f:
+                    self.content = f.read()
 
                 print('Assuming ' + encoding + ' encoding.')
                 break
             except UnicodeDecodeError:
                 pass
 
-        if not self.file:
+        if not self.content:
             raise UnicodeDecodeError('Encoding not recognized! Re-save the cleaned text as utf-8 to continue.')
-
-    def __enter__(self):
-        return self.file
-
-    def __exit__(self, ctx_type, ctx_value, ctx_traceback):
-        self.file.close()
 
 
 class UTF8Recoder:

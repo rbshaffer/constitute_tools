@@ -46,8 +46,7 @@ class HierarchyManager:
         else:
             self.case_flags = re.I | re.M
 
-        with utils.TextLoader(text_path) as f:
-            self.text = f.read()
+        self.text = utils.TextLoader(text_path)
 
         # read reference data, if any
         self.tag_data = utils.TagLoader(tag_path, tag_format).data
