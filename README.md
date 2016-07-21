@@ -123,14 +123,19 @@ Chapter 2:
 ```
 
 ## Writing 
-After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful in some cases:
+After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful for some applications:
 
 ```
-ccp_out = manager.create_output('ccp')
-
-with open('/path/to/output.csv', 'wb') as f:
-  csv.writer(f).writerows(ccp_out)
+>> ccp_out = manager.create_output('ccp')
+>> print(ccp_out)
+[['1', '0', u'preamble', 'title', ''],
+ ['2', '1', '', 'body', u'The people of New Exampleland hereby found a new nation on December 1st, 2020.'],
+ ['3', '0', u'Chapter 1', 'title', u'The President.'],
+ ['4', '3', '', 'body', u"The country of New Exampleland shall have a president. The president's powers shall be:"],
+ ...
+]
 ```
+In this format, the first column is an index and the second column gives the "parent" index of the current row (with 0 reserved for the "base" level of the document). 
 
 ## Scripting wrappers
 For serial tagging taks, the wrappers.Tabulate class can streamline file management and function calls:
