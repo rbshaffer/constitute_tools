@@ -33,6 +33,20 @@ Currently, only Comparative Constitutions Project (CCP)-style tags are supported
 The only assumption made regarding header references is that headers are sequential; so, ``'75.1'`` would match ``'Article 75, Section 1, Part a'`` or ``'Article A, Section 75, Part 1'`` but not ``'Article 75, Section A, Part 1'``. If multiple matches are found, tags are not applied, and are instead appended to HierarchyManager.tag_report.
 
 # Outputs
+The main output from `parser.HierarchyManager` is a nested dictionary structure, with the following format:
+```
+{0: {'header': '',
+     'text': '',
+     'children': {0:
+                    ...
+                  },
+     'text_type': '',
+     'tags': [...]},
+  1:{
+      ...
+    }
+```
+This structure can be nested to arbitrary depth. Each level can contain text, headers, children, tags, and a `type` tag.
 
 # Example
 Suppose a user is interested in segmenting the following text:
