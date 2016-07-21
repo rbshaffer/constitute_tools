@@ -120,16 +120,18 @@ This structure can be nested to arbitrary depth. Each level can contain text, he
 Other outputs include `HierarchyManager.skeleton`, a visual aid which helps to check for parsing errors:
 
 ```
->>print(manager.skeleton)
+>>print(''.join(manager.skeleton))
 preamble
-Chapter 1:
-     1.
-     2.
-     3.
-Chapter 2:
-     A.
-     B.
+Chapter 1
+	1
+	2
+	3
+Chapter 2
+	A
+	B
 ```
+
+With punctuation automatically stripped for readability. For other details, see docstrings.
 
 ## Writing 
 After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful for some applications:
