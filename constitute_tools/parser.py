@@ -7,10 +7,12 @@
 import os
 import re
 import _file_utils as utils
+utils = reload(utils)
 import inspect
 import unicodedata
 from copy import deepcopy
 from itertools import chain
+
 
 
 class HierarchyManager:
@@ -280,7 +282,7 @@ class _Parser:
 
                             if title:
                                 text = text[title.end():]
-                                title = re.sub('<title>', '', title.group(0)).strip('\t\n\r ')
+                                title = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
                             else:
                                 title = ''
 
@@ -293,7 +295,7 @@ class _Parser:
                             new_entry['children'][0] = {'header': None,
                                                         'text': text,
                                                         'children': {},
-                                                        'text_type': 'body',
+                                                        'text_type': u'body',
                                                         'tags': []
                                                         }
 
@@ -304,7 +306,7 @@ class _Parser:
                             entry['children'][0] = {'header': None,
                                                     'text': start_stub,
                                                     'children': {i: new_entries[i] for i in range(len(new_entries))},
-                                                    'text_type': 'body',
+                                                    'text_type': u'body',
                                                     'tags': []}
                             entry['text'] = ''
                         # otherwise, add the new entries to the current level (keeping preexisting content)
@@ -351,14 +353,14 @@ class _Parser:
 
                         if len(list_entry) > 1:
                             for i in list_entry:
-                                list_entry[i]['text_type'] = 'olist'
+                                list_entry[i]['text_type'] = u'olist'
 
                             pre_list_entry['children'] = list_entry
                         else:
                             pre_list_entry['children'] = {0: {'header': '',
                                                               'text': '',
                                                               'children': list_entry,
-                                                              'text_type': 'ulist',
+                                                              'text_type': u'ulist',
                                                               'tags': []}}
 
                         new_entries.append(pre_list_entry)
@@ -513,20 +515,20 @@ class _Parser:
             if preamble:
                 preamble = re.sub('</?preamble>', '', preamble)
                 to_add.append({'header': u'preamble',
-                               'text': '',
+                               'text': u'',
                                'children': {0: {'header': None,
                                                 'text': preamble,
                                                 'children': {},
-                                                'text_type': 'body',
+                                                'text_type': u'body',
                                                 'tags': []}
                                             },
-                               'text_type': 'title',
+                               'text_type': u'title',
                                'tags': []})
 
-            to_add.append({'header': '',
+            to_add.append({'header': u'',
                            'text': body,
                            'children': {},
-                           'text_type': 'body',
+                           'text_type': u'body',
                            'tags': []})
 
             tabulated = {i: to_add[i] for i in range(len(to_add))}
@@ -559,8 +561,8 @@ class _Parser:
         """
 
         def minimal_format(text_string):
-            text_string = re.sub('\s+', ' ', text_string)
             text_string = re.sub('<.*?>', ' ', text_string)
+            text_string = re.sub('\s+', ' ', text_string)
             text_string = ''.join(e for e in text_string if unicodedata.category(e)[0] not in ['P', 'C'])
             text_string = text_string.lower()
             text_string = text_string.strip()
