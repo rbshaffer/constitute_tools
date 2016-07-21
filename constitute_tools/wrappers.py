@@ -80,7 +80,7 @@ class Tabulator:
                 writer.writeheader()
                 writer.writerows(manager.tag_report)
 
-        with open(skeleton_path, 'wb') as f:
+        with codecs.open(skeleton_path, 'wb') as f:
             f.write(repr(header_regex) + os.linesep)
             f.write(''.join(manager.skeleton))
 
