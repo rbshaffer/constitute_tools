@@ -28,9 +28,13 @@ The country of New Exampleland shall have a president. The president's powers sh
 Chapter 2: The Legislature.
 A. The legislature shall have the power to legislate on all topics by a simple majority vote.
 B. Members of the legislature shall be limited to 10 years in office.
+Chapter 3: The Judiciary.
+The judiciary shall:
+Rule on matters of ordinary law.
+Rule on matters of constitutional law.
 ```
 
-This text contains a preamble, a list with some preceding content, and titles on several headers. To capture this content, the user might mark up the text as follows:
+This text contains a preamble, two lists with some preceding content, and titles on several headers. To capture this content, the user might mark up the text as follows:
 
 ```
 <preamble>
@@ -46,6 +50,12 @@ The country of New Exampleland shall have a president. The president's powers sh
 Chapter 2: <title>The Legislature. </title>
 A. The legislature shall have the power to legislate on all topics by a simple majority vote.
 B. Members of the legislature shall be limited to 10 years in office.
+Chapter 3: The Judiciary.<title>
+The judiciary shall:
+<list>
+Rule on matters of ordinary law.
+Rule on matters of constitutional law.
+</list>
 ```
 
 The headers in this setup can be caputured with the following regular expression sequence: `['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']`.
