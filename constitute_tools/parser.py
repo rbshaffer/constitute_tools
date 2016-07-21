@@ -280,14 +280,19 @@ class _Parser:
                         # for all header matches in post-match content, extract titles and text and format an entry
                         for j, header_regex in enumerate(header_matches):
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
-                            title = re.search('^.*?<title>.*', text)
+                            if '</title>' in text and '<title>' in text:
+                                title = re.search('<title>.*?</title>', text)
+                            elif '<title>' in text:
+                                title = re.search('^.*?<title>.*', text)
+                            else:
+                                title = None
 
                             header = header_regex.group(0).strip('\t\n\r ')
                             header = re.sub('[,|;^#*]', '', header)
                             header = re.sub('[-.:](?![A-Za-z0-9])', '', header)
 
                             if title:
-                                text = text[title.end():]
+                                text = text[title.start():title.end()]
                                 title = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
                             else:
                                 title = ''
