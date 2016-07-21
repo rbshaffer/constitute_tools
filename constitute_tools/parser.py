@@ -203,7 +203,7 @@ class HierarchyManager:
                     current_index = len(out)+1
 
                     if entry['text_type'] != 'body' or line:
-                        out.append([str(current_index), str(parent_index), header_to_write,
+                        out.append([str(current_index), str(parent_index), header_to_write, '',
                                     entry['text_type'], line] + entry['tags'])
 
                 if entry['children']:
@@ -211,12 +211,15 @@ class HierarchyManager:
 
             return out
 
-        if output_format == 'ccp':
+        if 'ccp' in output_format:
             out_data = format_ccp(self.parsed)
 
             # rectangularize
             max_cols = max(len(row) for row in out_data)
             out_data = [row + ['']*(max_cols - len(row)) for row in out_data]
+
+            if 'multilingual' in output_format:
+                out_data = [row[0:2] + 3*[row[2]] + row[3:5] + 3*[row[5]] + row[6:] for row in out_data]
 
             return out_data
 
