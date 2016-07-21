@@ -34,8 +34,40 @@ The only assumption made regarding header references is that headers are sequent
 
 # Outputs
 
-# Examples
-A basic tagging application might look as follows:
+# Example
+Suppose a user is interested in segmenting the following text:
+
+```
+The people of New Exampleland hereby found a new nation on December 1st, 2020.
+Chapter 1: The President.
+The country of New Exampleland shall have a president. The president's powers shall be:
+1. Appoint judges.
+2. Veto laws.
+3. Propose the national budget.
+Chapter 2: The Legislature.
+A. The legislature shall have the power to legislate on all topics by a simple majority vote.
+B. Members of the legislature shall be limited to 10 years in office.
+```
+
+This text contains a preamble, a list with some preceding content, and titles on several headers. To capture this content, the user might mark up the text as follows:
+
+```
+<preamble>
+The people of New Exampleland hereby found a new nation on December 1st, 2020.
+</preamble>
+Chapter 1: <title> The President. </title>
+The country of New Exampleland shall have a president. The president's powers shall be:
+<list>
+1. Appoint judges.
+2. Veto laws.
+3. Propose the national budget.
+</list>
+Chapter 2: <title>The Legislature. </title>
+A. The legislature shall have the power to legislate on all topics by a simple majority vote.
+B. Members of the legislature shall be limited to 10 years in office.
+```
+
+And might use the following regular expressions to tag the text: `['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']`. To mark Chapter 1, Section 1 with a tag, the user would refer to that section as `1.1`. To mark Chapter 2, Section A, the user would refer to that section as `1.A`. To actually parse the structure, the user might use the following code snippet:
 
 ```
 import csv
@@ -54,7 +86,7 @@ with open(clean_text_path, 'wb') as f:
   
 # after making sure that the text is fully cleaned, parse it:
 tag_path = '/path/to/tags.csv'
-header_regex = ['Header the First [0-9]+', 'Header the Second [a-z]', 'Header|The|Third']
+header_regex = ['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']
 
 manager = HierarchyManager(text_path = text_path, header_regex = header_regex, tag_path = tag_path)
 manager.parse()
@@ -96,7 +128,7 @@ tabulator.clean_text(raw_text_path)
 # after checking to make sure that the text was cleaned appropriately, parse and generate output
 # by default, Tabulate will look for tag data in the Article_Numbers working directory folder
 cleaned_text = '/path/to/Constitute/Cleaned_Text/cleaned.txt'
-header_regex = ['Header the First [0-9]+', 'Header the Second [a-z]', 'Header|The|Third']
+header_regex = ['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']`
 
 # tabulate() will parse, apply tags, and write a CCP-style output to the Tabulated_Texts folder
 # reports will be written to the Reports folder
