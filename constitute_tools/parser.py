@@ -202,7 +202,7 @@ class HierarchyManager:
                 for line in split_text:
                     current_index = len(out)+1
 
-                    if entry['text_type'] not in ['body', 'ulist'] or line:
+                    if entry['text_type'] != 'body' or line:
                         out.append([str(current_index), str(parent_index), header_to_write,
                                     entry['text_type'], line] + entry['tags'])
 
@@ -279,10 +279,11 @@ class _Parser:
                         # for all header matches in post-match content, extract titles and text and format an entry
                         for j, header_regex in enumerate(header_matches):
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
+
                             if '</title>' in text and '<title>' in text:
                                 title = re.search('<title>.*?</title>', text)
                             elif '<title>' in text:
-                                title = re.search('^.*?<title>.*$', text)
+                                title = re.search('.*<title>.*', text)
                             else:
                                 title = None
 
@@ -464,7 +465,7 @@ class _Parser:
                     list_obj = {'header': None,
                                 'text': list_section,
                                 'children': {},
-                                'text_type': 'olist',
+                                'text_type': 'body',
                                 'tags': []
                                 }
                     return {'text': text_data, 'list_obj': list_obj, 'index': list_counter}
