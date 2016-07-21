@@ -85,25 +85,34 @@ manager.apply_tags()
 The parsed document is contained in HierarchyManager.parsed, which uses the following data structure:
 
 ```
-{0: {'header': 'preamble',
-     'text': 'The people of New Exampleland hereby[...]',
-     'children': {},
-     'text_type': 'body',
-     'tags': []
-     },
-  1:{'header': 'Chapter 1:',
-     'text': 'The President.',
-     'children':    {0: {'header': None,
-                         'text': 'The country of New Exampleland shall have a president.',
-                         'children': {...},
-                         'text_type': 'body',
-                         'tags': []
-                        }
-                    },
-     'text_type': 'title',
-     'tags': []
-     },
-...
+{0: 
+  {'header': u'preamble', 
+   'tags': [], 
+   'children': {0: 
+                  {'header': None, 
+                   'tags': [], 
+                   'children': {}, 
+                   'text_type': u'body', 
+                   'text': u'\nThe people of New Exampleland hereby found a new nation on December 1st, 2020.\n'
+                   }
+                }
+    'text': u'',
+    'text_type'=u'title'
+  }
+  1: 
+    {'header': u'Chapter 1', 
+     'tags': [], 
+     'children': {0: 
+                    {'header': None, 
+                     'text': u"The country of New Exampleland shall have a president. The president's powers shall be:", 'children': {...},
+                     'text_type': 'body', 
+                     'tags': []
+                     }
+                  }
+      'text': u'The President.',
+      'text_type': u'title'
+      }
+  ...
 }
 ```
 This structure can be nested to arbitrary depth. Each level can contain text, headers, children, tags, and a `type` tag, which is assigned automatically during parsing. Possible types include `body`, `title`, `ulist` (for "unorganized list", or a list without headers) and `olist` (for "organized list", or a list with headers).
