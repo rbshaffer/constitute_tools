@@ -85,25 +85,34 @@ manager.apply_tags()
 The parsed document is contained in HierarchyManager.parsed, which uses the following data structure:
 
 ```
-{0: {'header': 'preamble',
-     'text': 'The people of New Exampleland hereby[...]',
-     'children': {},
-     'text_type': 'body',
-     'tags': []
-     },
-  1:{'header': 'Chapter 1:',
-     'text': 'The President.',
-     'children':    {0: {'header': None,
-                         'text': 'The country of New Exampleland shall have a president.',
-                         'children': {...},
-                         'text_type': 'body',
-                         'tags': []
-                        }
-                    },
-     'text_type': 'title',
-     'tags': []
-     },
-...
+{0: 
+  {'header': u'preamble', 
+   'tags': [], 
+   'children': {0: 
+                  {'header': None, 
+                   'tags': [], 
+                   'children': {}, 
+                   'text_type': u'body', 
+                   'text': u'\nThe people of New Exampleland hereby found a new nation on December 1st, 2020.\n'
+                   }
+                }
+    'text': u'',
+    'text_type'=u'title'
+  }
+  1: 
+    {'header': u'Chapter 1', 
+     'tags': [], 
+     'children': {0: 
+                    {'header': None, 
+                     'text': u"The country of New Exampleland shall have a president. The president's powers shall be:", 'children': {...},
+                     'text_type': 'body', 
+                     'tags': []
+                     }
+                  }
+      'text': u'The President.',
+      'text_type': u'title'
+      }
+  ...
 }
 ```
 This structure can be nested to arbitrary depth. Each level can contain text, headers, children, tags, and a `type` tag, which is assigned automatically during parsing. Possible types include `body`, `title`, `ulist` (for "unorganized list", or a list without headers) and `olist` (for "organized list", or a list with headers).
@@ -111,26 +120,33 @@ This structure can be nested to arbitrary depth. Each level can contain text, he
 Other outputs include `HierarchyManager.skeleton`, a visual aid which helps to check for parsing errors:
 
 ```
->>print(manager.skeleton)
+>>print(''.join(manager.skeleton))
 preamble
-Chapter 1:
-     1.
-     2.
-     3.
-Chapter 2:
-     A.
-     B.
+Chapter 1
+	1
+	2
+	3
+Chapter 2
+	A
+	B
 ```
+
+With punctuation automatically stripped for readability. For other details, see docstrings.
 
 ## Writing 
-After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful in some cases:
+After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful for some applications:
 
 ```
-ccp_out = manager.create_output('ccp')
-
-with open('/path/to/output.csv', 'wb') as f:
-  csv.writer(f).writerows(ccp_out)
+>> ccp_out = manager.create_output('ccp')
+>> print(ccp_out)
+[['1', '0', u'preamble', 'title', ''],
+ ['2', '1', '', 'body', u'The people of New Exampleland hereby found a new nation on December 1st, 2020.'],
+ ['3', '0', u'Chapter 1', 'title', u'The President.'],
+ ['4', '3', '', 'body', u"The country of New Exampleland shall have a president. The president's powers shall be:"],
+ ...
+]
 ```
+In this format, the first column is an index and the second column gives the "parent" index of the current row (with 0 reserved for the "base" level of the document). 
 
 ## Scripting wrappers
 For serial tagging taks, the wrappers.Tabulate class can streamline file management and function calls:
