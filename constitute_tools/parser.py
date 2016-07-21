@@ -274,13 +274,17 @@ class _Parser:
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
                             title = re.search('^.*?<title>.*', text)
 
+                            header = header_regex.group(0).strip('\t\n\r ')
+                            header = re.sub('[,|;^#*]', '', header)
+                            header = re.sub('[-.:](?![A-Za-z0-9])', '', header)
+
                             if title:
                                 text = text[title.end():]
                                 title = re.sub('<title>', '', title.group(0)).strip('\t\n\r ')
                             else:
                                 title = ''
 
-                            new_entry = {'header': header_regex.group(0).strip('\t\n\r '),
+                            new_entry = {'header': header,
                                          'text': title,
                                          'children': {},
                                          'text_type': 'title',
@@ -351,8 +355,11 @@ class _Parser:
 
                             pre_list_entry['children'] = list_entry
                         else:
-                            list_entry[0]['text_type'] = 'ulist'
-                            pre_list_entry['children'] = list_entry
+                            pre_list_entry['children'] = {0: {'header': '',
+                                                              'text': '',
+                                                              'children': list_entry,
+                                                              'text_type': 'ulist',
+                                                              'tags': []}}
 
                         new_entries.append(pre_list_entry)
 
@@ -552,10 +559,10 @@ class _Parser:
         """
 
         def minimal_format(text_string):
+            text_string = re.sub('\s+', ' ', text_string)
             text_string = re.sub('<.*?>', ' ', text_string)
             text_string = ''.join(e for e in text_string if unicodedata.category(e)[0] not in ['P', 'C'])
             text_string = text_string.lower()
-            text_string = re.sub('\s+', ' ', text_string)
             text_string = text_string.strip()
 
             return text_string

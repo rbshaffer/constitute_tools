@@ -19,7 +19,7 @@ class TagLoader:
     def ccp(self):
         tag_data = None
 
-        if os.path.exists(self.tag_path):
+        if self.tag_path and os.path.exists(self.tag_path):
             with open(self.tag_path, 'rb') as f:
                 tag_data = list(csv.DictReader(f))
         return tag_data
