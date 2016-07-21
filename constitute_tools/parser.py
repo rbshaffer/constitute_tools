@@ -282,7 +282,7 @@ class _Parser:
                             if '</title>' in text and '<title>' in text:
                                 title = re.search('<title>.*?</title>', text)
                             elif '<title>' in text:
-                                title = re.search('^.*?<title>.*', text)
+                                title = re.search('^.*?<title>.*$', text)
                             else:
                                 title = None
 
@@ -291,7 +291,7 @@ class _Parser:
                             header = re.sub('[-.:](?![A-Za-z0-9])', '', header)
 
                             if title:
-                                text = text[title.start():title.end()]
+                                text = text[:title.start()] + text[title.end():]
                                 title_text = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
                             else:
                                 title_text = ''
@@ -516,7 +516,7 @@ class _Parser:
             else:
                 preamble_end = 0
 
-            preamble = text[preamble_start:preamble_end]
+            preamble = text[preamble_start:preamble_end].strip('\n\r\t ')
             body = text[preamble_end:]
 
             to_add = []
@@ -596,6 +596,7 @@ class _Parser:
 
         original_text = self.text
         for tag in self.header_regex:
+            tag = '^' + tag.replace('|', '|^')
             original_text = re.sub(tag, ' ', original_text, flags=self.case_flags)
 
         original_text = minimal_format(original_text)
