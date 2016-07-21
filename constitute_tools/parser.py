@@ -292,12 +292,12 @@ class _Parser:
 
                             if title:
                                 text = text[title.start():title.end()]
-                                title = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
+                                title_text = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
                             else:
-                                title = ''
+                                title_text = ''
 
                             new_entry = {'header': header,
-                                         'text': title,
+                                         'text': title_text,
                                          'children': {},
                                          'text_type': 'title',
                                          'tags': []}
@@ -576,6 +576,7 @@ class _Parser:
             text_string = ''.join(e for e in text_string if unicodedata.category(e)[0] not in ['P', 'C'])
             text_string = text_string.lower()
             text_string = text_string.strip()
+            text_string = re.sub('\s+', ' ', text_string)
 
             return text_string
 
@@ -602,8 +603,6 @@ class _Parser:
         processed_text = combine(self.parsed)
         processed_text = minimal_format(processed_text)
 
-        original_text = original_text.strip()
-
         desync_point = 0
         while desync_point < min(len(processed_text), len(original_text)):
             if processed_text[desync_point] != original_text[desync_point]:
@@ -615,9 +614,9 @@ class _Parser:
             print('Warning! Desync between original and tabulated text found.')
 
             print('Original text fragment:')
-            print(original_text[desync_point-100:desync_point+200])
+            print(original_text[desync_point-50:desync_point+100])
             print('Processed text fragment:')
-            print(processed_text[desync_point-100:desync_point+200])
+            print(processed_text[desync_point-50:desync_point+100])
 
 
 def clean_text(raw_text):
