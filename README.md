@@ -12,6 +12,9 @@ Basic functionality is provided through ``parser.HierachyManager``, which expose
 **constitute_tools** assumes Python 2.7.x (Python 3 version coming soon). No dependencies beyond the base Python packages are required. 
 
 # Usage
+## Assumptions
+The constitute_tools parser assumes that headers are straightforwardly nested. If header organization is ambiguous or nesting structure switches from location to location in the document, bad results are likely.
+
 ## Markup
 Suppose a user is interested in segmenting the following text:
 
