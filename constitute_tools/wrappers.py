@@ -73,17 +73,12 @@ class Tabulator:
             utils.UnicodeWriter(f).writerows(out)
 
         if manager.tag_data:
-            if manager.tag_report is not None:
-                print('{0} out of {1} tags not matched. See reports for details.'.format(len(manager.tag_report),
-                                                                                         len(manager.tag_data)))
-                with open(tag_report_path, 'wb') as f:
-                    var_names = sorted(manager.tag_report[0].keys())
+            with open(tag_report_path, 'wb') as f:
+                var_names = sorted(manager.tag_report[0].keys())
 
-                    writer = csv.DictWriter(f, var_names)
-                    writer.writeheader()
-                    writer.writerows(manager.tag_report)
-            else:
-                print('All tags successfully matched.')
+                writer = csv.DictWriter(f, var_names)
+                writer.writeheader()
+                writer.writerows(manager.tag_report)
 
         with open(skeleton_path, 'wb') as f:
             f.write(repr(header_regex) + os.linesep)

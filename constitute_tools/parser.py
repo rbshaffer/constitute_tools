@@ -7,7 +7,6 @@
 import os
 import re
 import _file_utils as utils
-utils = reload(utils)
 import inspect
 import unicodedata
 from copy import deepcopy
@@ -169,6 +168,13 @@ class HierarchyManager:
                     self.parsed = apply_tag(self.parsed, key_sequence, tag_name)
                 else:
                     self.tag_report.append(tag_entry)
+
+            # output a quick summary of number of tags matched
+            if self.tag_report is not None:
+                print('{0} out of {1} tags not matched. See reports for details.'.format(len(self.tag_report),
+                                                                                         len(self.tag_data)))
+            else:
+                print('All tags successfully matched.')
 
     def create_output(self, output_format='ccp'):
         """
