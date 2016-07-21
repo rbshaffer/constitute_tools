@@ -82,7 +82,7 @@ class Tabulator:
 
         with open(skeleton_path, 'wb') as f:
             f.write(repr(header_regex) + os.linesep)
-            f.writelines(manager.skeleton)
+            f.write(''.join(manager.skeleton))
 
     def set_structure(self):
         """
