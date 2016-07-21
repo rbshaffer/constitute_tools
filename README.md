@@ -134,7 +134,7 @@ Chapter 2
 With punctuation automatically stripped for readability. For other details, see docstrings.
 
 ## Error-checking
-As a sanity check, the model automatically checks for desyncronization (lost text) between the original text and the parsed text, and outputs a warning if text goes missing. Otherwise, parser correctness is difficult to determine programmatically, so users will need to confirm parser accuracy by hand.
+As a sanity check, the model automatically checks for desyncronization (lost text) between the original text and the parsed text, and outputs a warning if text goes missing. If content tag data is given, unmatched tag entries will be placed in `HierarchyManager.tag_report`. Otherwise, parser correctness is difficult to determine programmatically, so users will need to confirm parser accuracy by hand.
 
 ## Writing 
 After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful for some applications:
