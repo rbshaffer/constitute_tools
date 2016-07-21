@@ -182,9 +182,9 @@ Texts should be formatted with organizational headers at the beginning of the li
 
 Non-ASCII text formats are usually handled gracefully. However, for best results, texts should be saved in UTF-8 format.
 
-Texts can be marked up using two different tagging structures. Some headers contain titles (e.g. ``'Article 1: The Presidency'``), which can be marked using a ``<title>`` tag placed anywhere on the same line (e.g. ``'Article 1: The Presidency <title>'``). ``<title>`` tags do not need to be closed.
+Texts can be marked up using two different tagging structures. Some headers contain titles (e.g. ``'Article 1: The Presidency'``), which can be marked using a ``<title>`` tag placed anywhere on the same line (e.g. ``'Article 1: The Presidency <title>'``). If the closing `</title` tag is omitted, the line containing the opening `<title>` tag will be treated as the title.
 
-Other headers contain lists, which may be preceded or followed by additional text. Lists should be enclosed in ``<list>`` tags, with nested lists differentiated using index numbers (e.g. ``'<list_1>...<list_2>...</list_2></list_3>'``). Indices can be replicated outside of a given nested structure. ``<list>`` tags should be closed. 
+Other headers contain lists, which may be preceded or followed by additional text. Lists should be enclosed in ``<list>`` tags, with nested lists differentiated using index numbers (e.g. ``'<list_1>...<list_2>...</list_2></list_3>'``). Indices can be replicated outside of a given nested structure.
 
 ## Header list
 The organizational header list should be ordered from highest- to lowest-level header, with same-level headers contained in the same text string and separated by pipes (e.g. ``'[ivx]+|(Introduction|Notes|Sources)'``). 
