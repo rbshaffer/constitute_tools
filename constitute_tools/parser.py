@@ -239,7 +239,7 @@ class _Parser:
         """
 
         self.text = text
-        self.header_regex = ['^' + h.replace('|', '|^') for h in header_regex]
+        self.header_regex = ['^' + unicode(h, encoding='utf8').replace('|', '|^') for h in header_regex]
         self.preamble_level = preamble_level
         self.case_flags = case_flags
 
