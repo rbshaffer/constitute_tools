@@ -206,3 +206,6 @@ The organizational header list should be ordered from highest- to lowest-level h
 Currently, only Comparative Constitutions Project (CCP)-style tags are supported. In the CCP format, tags are organized into a CSV file with labeled 'tag' and 'article' columns (as well as any other variables that might be useful). The 'tag' column should contain variable names and the 'article' column should contain a reference to an organizational header level (e.g. ``'75.1.a'`` for ``'Article 75, Section 1, Part a'``). 
 
 The only assumption made regarding header references is that headers are sequential; so, ``'75.1'`` would match ``'Article 75, Section 1, Part a'`` or ``'Article A, Section 75, Part 1'`` but not ``'Article 75, Section A, Part 1'``. If multiple matches are found, tags are not applied, and are instead appended to HierarchyManager.tag_report.
+
+## Licensing
+This project is licensed under the terms of the MIT license.
