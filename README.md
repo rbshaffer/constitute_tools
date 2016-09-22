@@ -110,7 +110,7 @@ The parsed document is contained in HierarchyManager.parsed, which uses the foll
                    }
                 }
     'text': u'',
-    'text_type'=u'title'
+    'text_type': u'title'
   }
   1: 
     {'header': u'Chapter 1', 
@@ -118,7 +118,7 @@ The parsed document is contained in HierarchyManager.parsed, which uses the foll
      'children': {0: 
                     {'header': None, 
                      'text': u"The country of New Exampleland shall have a president. The president's powers shall be:", 'children': {...},
-                     'text_type': 'body', 
+                     'text_type': u'body', 
                      'tags': []
                      }
                   }
