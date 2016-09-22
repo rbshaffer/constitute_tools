@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Created on Feb 17, 2013
-# Last updated on June 28, 2016
+# Last updated on September 22, 2016
 # @author: Robert Shaffer
 
 import os
