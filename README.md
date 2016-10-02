@@ -13,7 +13,7 @@ Basic functionality is provided through ``parser.HierachyManager``, which expose
 
 # Usage
 ## Assumptions
-The constitute_tools parser assumes that headers are straightforwardly nested. If header organization is ambiguous or nesting structure switches from location to location in the document, bad results are likely.
+The constitute_tools parser assumes that headers are straightforwardly nested. In other words, the hierarchical ordering of headers should be consistent in all locations in the document (though levels can be skipped or omitted) If header organization is ambiguous or nesting structure switches from location to location in the document, the parser will likely fail.
 
 ## Markup
 Suppose a user is interested in segmenting the following text:
@@ -76,7 +76,7 @@ with open(raw_text_path, 'rb') as f:
   raw_text = f.read()
 ```
 
-`parser.clean_text(raw_text)` cleans `raw_text` by removing extraneous whitespace and sanitizing tags. Users should review the text before proceeding for other formatting issues (see below for details), as some issues may not be caught.
+`parser.clean_text(raw_text)` cleans `raw_text` by removing extraneous whitespace and sanitizing tags. Users should review the text before proceeding for other formatting problems (see below for details), as some issues may not be caught.
 
 ```
 with open(clean_text_path, 'wb') as f:
@@ -98,35 +98,35 @@ manager.apply_tags()
 The parsed document is contained in HierarchyManager.parsed, which uses the following data structure:
 
 ```
-{0: 
+[ 
   {'header': u'preamble', 
    'tags': [], 
-   'children': {0: 
+   'children': [ 
                   {'header': None, 
                    'tags': [], 
                    'children': {}, 
                    'text_type': u'body', 
                    'text': u'\nThe people of New Exampleland hereby found a new nation on December 1st, 2020.\n'
                    }
-                }
+                ]
     'text': u'',
     'text_type': u'title'
-  }
-  1: 
-    {'header': u'Chapter 1', 
-     'tags': [], 
-     'children': {0: 
-                    {'header': None, 
-                     'text': u"The country of New Exampleland shall have a president. The president's powers shall be:", 'children': {...},
-                     'text_type': u'body', 
-                     'tags': []
-                     }
-                  }
+   },
+  {'header': u'Chapter 1', 
+   'tags': [], 
+   'children': [
+                  {'header': None, 
+                   'text': u"The country of New Exampleland shall have a president. The president's powers shall be:",
+		   'children': [...],
+                   'text_type': u'body', 
+                   'tags': []
+                   }
+                ]
       'text': u'The President.',
       'text_type': u'title'
-      }
+    },
   ...
-}
+]
 ```
 This structure can be nested to arbitrary depth. Each level can contain text, headers, children, tags, and a `type` tag, which is assigned automatically during parsing. Possible types include `body`, `title`, `ulist` (for "unorganized list", or a list without headers) and `olist` (for "organized list", or a list with headers).
 
@@ -147,7 +147,7 @@ Chapter 2
 With punctuation automatically stripped for readability. For other details, see docstrings.
 
 ## Error-checking
-As a sanity check, the model automatically checks for desyncronization (lost text) between the original text and the parsed text, and outputs a warning if text goes missing. If content tag data is given, unmatched tag entries will be placed in `HierarchyManager.tag_report`. Otherwise, parser correctness is difficult to determine programmatically, so users will need to confirm parser accuracy by hand.
+As a sanity check, the model automatically checks for desyncronization (added or deleted text) between the original text and the parsed text, and outputs a warning if text goes missing. If content tag data is given, unmatched tag entries will be placed in `HierarchyManager.tag_report`. Otherwise, parser correctness is difficult to determine programmatically, so users will need to confirm parser accuracy by hand.
 
 ## Writing 
 After the user is satisfied with their results, parser.HierarchyManager offers a small function to write outputs in a flatted "CCP-style" structure, which may be useful for some applications:
