@@ -69,8 +69,7 @@ class HierarchyManager:
             if not out:
                 out = []
 
-            for i in obj:
-                entry = obj[i]
+            for entry in obj:
                 if entry['header']:
                     header_to_write = entry['header']
                     out.append(depth * '\t' + header_to_write + os.linesep)
@@ -116,7 +115,7 @@ class HierarchyManager:
             if not out:
                 out = {}
 
-            for i in obj:
+            for i in range(len(obj)):
                 entry = obj[i]
                 header = entry['header']
 
@@ -189,7 +188,7 @@ class HierarchyManager:
             if not out:
                 out = []
 
-            for i in sorted(obj):
+            for i in range(len(obj)):
                 current_index = len(out)
                 entry = obj[i]
 
@@ -266,8 +265,10 @@ class _Parser:
 
                 # iterate over object (note that object may change size during iteration)
                 entry_counter = 0
+
                 while entry_counter < len(obj):
                     entry = obj[entry_counter]
+
                     header_matches = list(re.finditer(header_tag, entry['text'], flags=case_flags))
 
                     # if a header match is found, split the text into pre-match start_stub and post-match content
@@ -283,7 +284,7 @@ class _Parser:
                         for j, header_regex in enumerate(header_matches):
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
 
-                            if '</title>' in text and '<title>' in text:
+                            if '<title>' in text and '</title>' in text:
                                 title = re.search('<title>.*?</title>', text)
                             elif '<title>' in text:
                                 title = re.search('.*<title>.*', text)
@@ -302,34 +303,46 @@ class _Parser:
 
                             new_entry = {'header': header,
                                          'text': title_text,
-                                         'children': {},
-                                         'text_type': 'title',
+                                         'children': deepcopy(entry['children']),
+                                         'text_type': u'title',
                                          'tags': []}
 
-                            new_entry['children'][0] = {'header': None,
-                                                        'text': text,
-                                                        'children': {},
-                                                        'text_type': u'body',
-                                                        'tags': []
-                                                        }
+                            new_entry['children'].insert(0, {'header': None,
+                                                             'text': text,
+                                                             'children': [],
+                                                             'text_type': u'body',
+                                                             'tags': []
+                                                             }
+                                                         )
 
                             new_entries.append(new_entry)
 
+                        # handle case where organization "skips" a level
+                        # if we look to shatter content and children are already present, then that implies:
+                        #  - carry-over children from new entries are duplicates by definition (except for first one)
+                        #  - new entries should be on the same level as existing children
+                        # this section deletes duplicate children and adds new entries to same level as existing
+                        if entry['children']:
+                            for j in range(len(new_entries)):
+                                new_entries[j]['children'] = new_entries[j]['children'][0:1]
+
+                            entry['text'] = start_stub
+                            entry['children'] = new_entries + entry['children']
+
                         # if there is a start_stub, then add new header matches as children of the current entry
-                        if start_stub:
-                            entry['children'][0] = {'header': None,
-                                                    'text': start_stub,
-                                                    'children': {i: new_entries[i] for i in range(len(new_entries))},
-                                                    'text_type': u'body',
-                                                    'tags': []}
+                        elif start_stub:
+                            entry['children'].insert(0, {'header': None,
+                                                         'text': start_stub,
+                                                         'children': new_entries,
+                                                         'text_type': u'body',
+                                                         'tags': []}
+                                                     )
                             entry['text'] = ''
+
                         # otherwise, add the new entries to the current level (keeping preexisting content)
                         else:
-                            updated_obj = {i: obj[i] for i in obj if i < entry_counter}
-                            updated_obj.update({i+entry_counter: new_entries[i] for i in range(len(new_entries))})
-                            updated_obj.update({i+len(new_entries)-1: obj[i] for i in obj if i > entry_counter})
-
-                            obj = updated_obj
+                            obj = obj[:entry_counter] + new_entries + obj[entry_counter + 1:]
+                            entry = obj[entry_counter]
 
                     entry['children'] = shatter(entry['children'], header_tag, case_flags)
                     entry_counter += 1
@@ -366,16 +379,16 @@ class _Parser:
                         post_list_entry['text'] = entry['text'][list_search.end():].strip('\n\r ')
 
                         if len(list_entry) > 1:
-                            for i in list_entry:
+                            for i in range(len(list_entry)):
                                 list_entry[i]['text_type'] = u'olist'
 
                             pre_list_entry['children'] = list_entry
                         else:
-                            pre_list_entry['children'] = {0: {'header': '',
-                                                              'text': '',
-                                                              'children': list_entry,
-                                                              'text_type': u'ulist',
-                                                              'tags': []}}
+                            pre_list_entry['children'] = [{'header': '',
+                                                           'text': '',
+                                                           'children': list_entry,
+                                                           'text_type': u'ulist',
+                                                           'tags': []}]
 
                         new_entries.append(pre_list_entry)
 
@@ -383,10 +396,7 @@ class _Parser:
                             new_entries.append(post_list_entry)
 
                         # rebuild the object by combining earlier content, re-inserted content, and later content
-                        updated_obj = {i: obj[i] for i in obj if i < entry_counter}
-                        updated_obj.update({i + entry_counter: new_entries[i] for i in range(len(new_entries))})
-                        updated_obj.update({i + len(new_entries)-1: obj[i] for i in obj if i > entry_counter})
-
+                        updated_obj = obj[:entry_counter] + new_entries + obj[entry_counter + 1:]
                         obj = updated_obj
 
                     # recursively apply assemble() to check for lists in children of the current object
@@ -401,8 +411,9 @@ class _Parser:
         # shatter tabulated file and the list table
         for tag in self.header_regex:
             self.parsed = shatter(self.parsed, tag, self.case_flags)
-            for key in self.list_table:
-                self.list_table[key] = shatter(self.list_table[key], tag, self.case_flags)
+
+            for i in range(len(self.list_table)):
+                self.list_table[i] = shatter(self.list_table[i], tag, self.case_flags)
 
         # reassemble the tabulated file and the list table together
         self.parsed = assemble(self.parsed, self.list_table)
@@ -465,25 +476,24 @@ class _Parser:
                     text_data = text_data[:open_tag_regex.start()] + '{@' + str(list_counter) + '}' + \
                                 text_data[(open_tag_regex.end() + close_tag_regex.end()):]
 
-                    list_obj = {'header': None,
-                                'text': list_section,
-                                'children': {},
-                                'text_type': 'body',
-                                'tags': []
-                                }
+                    list_obj = [{'header': None,
+                                 'text': list_section,
+                                 'children': [],
+                                 'text_type': 'body',
+                                 'tags': []}]
                     return {'text': text_data, 'list_obj': list_obj, 'index': list_counter}
                 else:
                     return None
 
             check_list_syntax(text)
-            list_data = {}
+            list_data = []
 
             # get lists from text
             while True:
                 list_output = get_lists(text, len(list_data))
                 if list_output:
                     text = list_output['text']
-                    list_data.update({list_output['index']: {0: list_output['list_obj']}})
+                    list_data.append(list_output['list_obj'])
                 else:
                     break
 
@@ -495,7 +505,7 @@ class _Parser:
 
                 if list_output:
                     entry['text'] = list_output['text']
-                    list_data.update({list_output['index']: {0: list_output['list_obj']}})
+                    list_data.append(list_output['list_obj'])
                 else:
                     list_table_counter += 1
 
@@ -523,29 +533,29 @@ class _Parser:
             preamble = text[preamble_start:preamble_end].strip('\n\r\t ')
             body = text[preamble_end:]
 
-            to_add = []
+            tabulated = []
 
             # add the preamble (if any) and the body text to self.tabulated
             if preamble:
                 preamble = re.sub('</?preamble>', '', preamble)
-                to_add.append({'header': u'preamble',
-                               'text': u'',
-                               'children': {0: {'header': None,
+                tabulated.append({'header': u'preamble',
+                                  'text': u'',
+                                  'children': [{'header': None,
                                                 'text': preamble,
-                                                'children': {},
+                                                'children': [],
                                                 'text_type': u'body',
-                                                'tags': []}
-                                            },
-                               'text_type': u'title',
-                               'tags': []})
+                                                'tags': []
+                                                }
+                                               ],
+                                  'text_type': u'title',
+                                  'tags': []})
 
-            to_add.append({'header': u'',
-                           'text': body,
-                           'children': {},
-                           'text_type': u'body',
-                           'tags': []})
+            tabulated.append({'header': u'',
+                              'text': body,
+                              'children': [],
+                              'text_type': u'body',
+                              'tags': []})
 
-            tabulated = {i: to_add[i] for i in range(len(to_add))}
             return tabulated
 
         to_process = self.text
@@ -588,8 +598,7 @@ class _Parser:
             if not out:
                 out = u''
 
-            for i in obj:
-                entry = obj[i]
+            for entry in obj:
                 if entry['text']:
                     out += u' ' + entry['text'].strip()
                     out = out.strip()
