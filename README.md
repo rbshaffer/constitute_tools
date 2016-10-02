@@ -104,7 +104,7 @@ The parsed document is contained in HierarchyManager.parsed, which uses the foll
    'children': [ 
                   {'header': None, 
                    'tags': [], 
-                   'children': {}, 
+                   'children': [], 
                    'text_type': u'body', 
                    'text': u'\nThe people of New Exampleland hereby found a new nation on December 1st, 2020.\n'
                    }
@@ -117,7 +117,7 @@ The parsed document is contained in HierarchyManager.parsed, which uses the foll
    'children': [
                   {'header': None, 
                    'text': u"The country of New Exampleland shall have a president. The president's powers shall be:",
-		   'children': [...],
+                   'children': [...],
                    'text_type': u'body', 
                    'tags': []
                    }
