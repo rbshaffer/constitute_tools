@@ -58,7 +58,7 @@ Rule on matters of constitutional law.
 </list>
 ```
 
-The headers in this setup can be caputured with the following regular expression sequence: `['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']`.
+The headers in this setup can be captured with the following regular expression sequence: `['Chapter [0-9]+:', '[0-9]\.|[A-Z]\.']`. By default, regular expression searches are not sensitive to case; however, users can toggle case sensitivity with the ``case_sensitive=True`` argument in ``HierarchyManager``.
 
 ## Parsing
 
