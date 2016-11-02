@@ -26,8 +26,7 @@ class Tabulator:
         :param text_path: path to file to be cleaned.
         """
 
-        with utils.TextLoader(text_path) as f:
-            raw_text = f.read()
+        raw_text = utils.TextLoader(text_path).content
 
         file_name = os.path.basename(text_path)
         out_path = '{1}{0}Constitute{0}Cleaned_Texts{0}{2}'.format(os.sep, self.pwd, file_name)
