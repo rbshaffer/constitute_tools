@@ -284,7 +284,10 @@ class _Parser:
                         for j, header_regex in enumerate(header_matches):
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
 
-                            first_line_index = re.search('[\n\r]', text).start()
+                            first_line_index = re.search('[\n\r]', text)
+                            if not first_line_index:
+                                first_line_index = len(text)
+
                             first_line = text[:first_line_index]
 
                             if '<title>' in first_line and '</title>' in first_line:
