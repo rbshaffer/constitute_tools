@@ -287,8 +287,11 @@ class _Parser:
                             first_line_index = re.search('[\n\r]', text)
                             if not first_line_index:
                                 first_line_index = len(text)
+                            else:
+                                first_line_index = first_line_index.end()
 
                             first_line = text[:first_line_index]
+                            first_line = first_line.strip('\t\n\r ')
 
                             if '<title>' in first_line and '</title>' in first_line:
                                 title = re.search('<title>.*?</title>', first_line)
