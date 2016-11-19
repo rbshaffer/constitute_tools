@@ -284,10 +284,13 @@ class _Parser:
                         for j, header_regex in enumerate(header_matches):
                             text = entry['text'][header_regex.end():header_starts[j+1]].strip('\t\n\r ')
 
-                            if '<title>' in text and '</title>' in text:
-                                title = re.search('<title>.*?</title>', text)
-                            elif '<title>' in text:
-                                title = re.search('.*<title>.*', text)
+                            first_line_index = re.search('[\n\r]', text).start()
+                            first_line = text[:first_line_index]
+
+                            if '<title>' in first_line and '</title>' in first_line:
+                                title = re.search('<title>.*?</title>', first_line)
+                            elif '<title>' in first_line:
+                                title = re.search('.*<title>.*', first_line)
                             else:
                                 title = None
 
@@ -296,7 +299,7 @@ class _Parser:
                             header = re.sub('[-.:](?![A-Za-z0-9])', '', header)
 
                             if title:
-                                text = text[:title.start()] + text[title.end():]
+                                text = first_line[:title.start()] + first_line[title.end():] + text[first_line_index:]
                                 title_text = re.sub('</?title>', '', title.group(0)).strip('\t\n\r ')
                             else:
                                 title_text = ''
