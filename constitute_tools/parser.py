@@ -189,7 +189,6 @@ class HierarchyManager:
                 out = []
 
             for i in range(len(obj)):
-                current_index = len(out)
                 entry = obj[i]
 
                 if entry['header']:
@@ -206,7 +205,7 @@ class HierarchyManager:
                                     entry['text_type'], line] + entry['tags'])
 
                 if entry['children']:
-                    out = format_ccp(entry['children'], out, parent_index=current_index)
+                    out = format_ccp(entry['children'], out, parent_index=len(out))
 
             return out
 
